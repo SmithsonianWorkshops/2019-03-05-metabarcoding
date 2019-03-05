@@ -204,7 +204,7 @@ $ cd /pool/genomics/{}/hydra_workshop
 
 ## Transferring files
 
-[https://cyberduck.io/](CyberDuck)
+[CyberDuck](https://cyberduck.io/)
 
 
 
