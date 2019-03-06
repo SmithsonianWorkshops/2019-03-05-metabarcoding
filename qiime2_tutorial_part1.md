@@ -101,7 +101,17 @@ qiime dada2 denoise-paired \
  --o-denoising-stats ../data/working/stats-dada2.qza
 ```
 
-### Copy full dada2 results to local
+### View dada2 results summary
+Now we’ll run a summarize command to look at how dada2 filtered our reads.
+```
+qiime metadata tabulate \
+  --m-input-file ../data/working/stats-dada2.qza \
+  --o-visualization ../data/working/stats-dada2.qzv
+```
+
+Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
+
+### Copy full dada2 results to your data/working
 Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime_tutorial`.
 ```
 cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza \
