@@ -189,16 +189,18 @@ qiime metadata tabulate \
 ```
 2. Export your tree to Newick format
 ```
-qiime tools export ../data/working/rooted-tree.qza \
-  --output-dir ../data/results
+qiime tools export \
+--input-path ../data/working/rooted-tree.qza \
+--output-path ../data/results/rooted-tree.tre
 ```
 
 ###  Alpha diversity
 1. Use ```core-metrics```, which rarefies a FeatureTable to a user-specified depth, and then computes a series of alpha and beta diversity metrics. 
 ```
-qiime diversity core-metrics \
+qiime diversity core-metrics-phylogenetic \
   --i-phylogeny ../data/working/rooted-tree.qza \
   --i-table ../data/working/table-dada2.qza \
+  --metadata-file ../data/working/sample-metadata.tsv \
   --p-sampling-depth 1109 \
   --output-dir core-metrics-results
  ```
