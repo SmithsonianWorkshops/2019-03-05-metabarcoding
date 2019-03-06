@@ -120,7 +120,12 @@ cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza
 /data/genomics/workshops/qiime2/sample-metadata.tsv
 data/working
 ```
-
+Now we’ll run a summarize command to look at how dada2 filtered our reads.
+```
+qiime metadata tabulate \
+  --m-input-file ../data/working/stats-dada2.qza \
+  --o-visualization ../data/results/stats-dada2.qzv
+```
 ### Generate FeatureTable and FeatureData Summaries
 The feature-table summarize command will give you information on how many sequences are associated with each sample and with each feature, histograms of those distributions, and some related summary statistics. The feature-table tabulate-seqs command will provide a mapping of feature IDs to sequences, and provide links to easily BLAST each sequence against the NCBI nt database. 
 
