@@ -74,17 +74,17 @@ View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of 
 Now we'll trim the primers off the sequences with cutadapt, which is available through the QIIME2 module. Run this with a job file and ```qsub``` 
 ```
 qiime cutadapt trim-paired \
- --i-demultiplexed-sequences data/working/paired-end.qza \
+ --i-demultiplexed-sequences ../data/working/paired-end.qza \
  --p-cores $NSLOTS \
  --p-front-f GGWACWGGWTGAACWGTWTAYCCYCC \
  --p-front-r TANACYTCNGGRTGNCCRAARAAYCA \
- --o-trimmed-sequences data/working/paired-end-primers-trimmed.qza
+ --o-trimmed-sequences ../data/working/paired-end-primers-trimmed.qza
 ```
 Now we'll run a summarize command to look at the quality scores. Either run this within a job file with ```qsub``` or on an interactive job with ```qrsh```
 ```
 qiime demux summarize \
-  --i-data data/working/paired-end-primers-trimmed.qza \
-  --o-visualization data/results/paired-end-primers-trimmed.qzv
+  --i-data ../data/working/paired-end-primers-trimmed.qza \
+  --o-visualization ../data/results/paired-end-primers-trimmed.qzv
   ```
 View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences. From these plots, we'll decide how much to trim the sequences for quality.
 
@@ -92,11 +92,11 @@ View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of 
 Now we'll trim our sequences for quality and do filter out chimeras. This will take the longest of anything we've done so far, so use ```qsub``` and a job file for this command.
 ```
 qiime dada2 denoise-paired \
- --i-demultiplexed-seqs data/working/paired-end-primers-trimmed.qza \
+ --i-demultiplexed-seqs ../data/working/paired-end-primers-trimmed.qza \
  --p-n-threads $NSLOTS \
  --p-trunc-len-f 270 \
  --p-trunc-len-r 170 \
- --o-representative-sequences data/working/rep-seqs-dada2.qza \
- --o-table data/working/table-dada2.qza \
- --o-denoising-stats data/working/stats-dada2.qza
+ --o-representative-sequences ../data/working/rep-seqs-dada2.qza \
+ --o-table ../data/working/table-dada2.qza \
+ --o-denoising-stats ../data/working/stats-dada2.qza
 ```
