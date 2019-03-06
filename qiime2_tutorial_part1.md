@@ -111,14 +111,10 @@ qiime metadata tabulate \
 
 Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
 
-### Copy full dada2 results to data/working
-Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime_tutorial`.
+### Copy full dada2 results to your data/working
+Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime2_tutorial`.
 ```
-cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza 
-/data/genomics/workshops/qiime2/table-dada2.qza 
-/data/genomics/workshops/qiime2/stats-dada2.qza
-/data/genomics/workshops/qiime2/sample-metadata.tsv
-data/working
+cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/data/sample_metadata.tsv data/working
 ```
 
 ### Generate FeatureTable and FeatureData Summaries
@@ -134,4 +130,27 @@ qiime feature-table summarize \
 qiime feature-table tabulate-seqs \
   --i-data ../data/working/rep-seqs-dada2.qza \
   --o-visualization ../data/results/rep-seqs.qzv
+```
+### Train taxonomic classifier
+## Import COI reference database sequences and metadata to QIIME2
+```
+qiime tools import \
+  --type 'FeatureData[Sequence]' \
+  --input-path /data/genomics/workshops/qiime2/data/classifier/bold_CO1.fasta \
+  --output-path bold.qza
+```
+```
+qiime tools import \
+  --type 'FeatureData[Taxonomy]' \
+  --input-format HeaderlessTSVTaxonomyFormat \
+  --input-path /data/genomics/workshops/qiime2/data/classifier/bold_only.txt \
+  --output-path ref-taxonomy.qza
+```
+## Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
+```
+qiime feature-classifier fit-classifier-naive-bayes \
+  --i-reference-reads bold_CO1.qza \
+  --i-reference-taxonomy bold_taxonomy.qza \
+  --o-classifier bold_classifier.qza \
+  --verbose
 ```
