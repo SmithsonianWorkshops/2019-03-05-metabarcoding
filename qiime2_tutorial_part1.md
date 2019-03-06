@@ -157,8 +157,8 @@ qiime tools import \
 #### Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
 ```
 qiime feature-classifier fit-classifier-naive-bayes \
-  --i-reference-reads ../data/working/bold_CO1.qza \
-  --i-reference-taxonomy ../data/working/bold_taxonomy.qza \
+  --i-reference-reads ../data/working/bold.qza \
+  --i-reference-taxonomy ../data/working/ref-taxonomy.qza \
   --o-classifier ../data/working/bold_classifier.qza \
   --verbose
 ```
