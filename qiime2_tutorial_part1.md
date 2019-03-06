@@ -56,7 +56,7 @@ qiime tools import \
  --type ‘SampleData[PairedEndSequencesWithQuality]’ \
  --input-path ../data/raw \
  --input-format CasavaOneEightSingleLanePerSampleDirFmt \
- --output-path data/working/paired-end.qza
+ --output-path ../data/working/paired-end.qza
 #
 echo = `date` job $JOB_NAME done
 ```
