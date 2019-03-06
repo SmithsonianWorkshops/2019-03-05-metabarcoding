@@ -200,7 +200,7 @@ qiime tools export \
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny ../data/working/rooted-tree.qza \
   --i-table ../data/working/table-dada2.qza \
-  --metadata-file ../data/working/sample-metadata.tsv \
+  --m-metadata-file ../data/working/sample-metadata.tsv \
   --p-sampling-depth 1109 \
   --output-dir core-metrics-results
  ```
