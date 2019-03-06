@@ -106,7 +106,7 @@ Now we’ll run a summarize command to look at how dada2 filtered our reads.
 ```
 qiime metadata tabulate \
   --m-input-file ../data/working/stats-dada2.qza \
-  --o-visualization ../data/working/stats-dada2.qzv
+  --o-visualization ../data/results/stats-dada2.qzv
 ```
 
 Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
