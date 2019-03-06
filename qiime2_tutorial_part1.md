@@ -137,20 +137,20 @@ qiime feature-table tabulate-seqs \
 qiime tools import \
   --type 'FeatureData[Sequence]' \
   --input-path /data/genomics/workshops/qiime2/data/classifier/bold_CO1.fasta \
-  --output-path bold.qza
+  --output-path ../data/working/bold.qza
 ```
 ```
 qiime tools import \
   --type 'FeatureData[Taxonomy]' \
   --input-format HeaderlessTSVTaxonomyFormat \
   --input-path /data/genomics/workshops/qiime2/data/classifier/bold_only.txt \
-  --output-path ref-taxonomy.qza
+  --output-path ../data/working/ref-taxonomy.qza
 ```
 ## Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
 ```
 qiime feature-classifier fit-classifier-naive-bayes \
-  --i-reference-reads bold_CO1.qza \
-  --i-reference-taxonomy bold_taxonomy.qza \
-  --o-classifier bold_classifier.qza \
+  --i-reference-reads ../data/working/bold_CO1.qza \
+  --i-reference-taxonomy ../data/working/bold_taxonomy.qza \
+  --o-classifier ../data/working/bold_classifier.qza \
   --verbose
 ```
