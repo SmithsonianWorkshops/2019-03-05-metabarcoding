@@ -65,8 +65,8 @@ Feel free to change the name of the output ```.qza``` file in the job file to so
 Now we'll run a summarize command to look at the quality scores. Either run this within a job file with ```qsub``` or on an interactive job with ```qrsh```
 ```
 qiime demux summarize \
-  --i-data data/working/paired-end.qza \
-  --o-visualization data/results/paired-end.qzv
+  --i-data ../data/working/paired-end.qza \
+  --o-visualization ../data/results/paired-end.qzv
   ```
 View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences.
 
