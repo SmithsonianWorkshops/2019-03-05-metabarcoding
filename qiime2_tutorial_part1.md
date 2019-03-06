@@ -21,7 +21,7 @@ In this tutorial, we will run part of the [QIIME 2](https://docs.qiime2.org/2017
     |-- jobs
     `-- logs
     ```
-5. We've downsampled the COI data from the recent wetlab workshop and put it here: ```data/genomics/workshops/qiime2/data``` 
+5. We've downsampled the COI data from the recent wetlab workshop and put it here: ```/data/genomics/workshops/qiime2/data``` 
 6. Choose two pairs of sequences and use ```cp``` to copy metadata and sequences to your ```raw``` directory. 
 7. Check to see that your data are there with ```ls data/raw```. You should have two ```fq.gz``` files, R1 and R2 for two samples and a ```.tsv```
 8. Edit the metadata file to include only the rows for the samples you have chosen.
