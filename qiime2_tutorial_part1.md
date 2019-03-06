@@ -100,3 +100,27 @@ qiime dada2 denoise-paired \
  --o-table ../data/working/table-dada2.qza \
  --o-denoising-stats ../data/working/stats-dada2.qza
 ```
+
+### Copy full dada2 results to local
+Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime_tutorial`.
+```
+cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza \
+/data/genomics/workshops/qiime2/table-dada2.qza \
+/data/genomics/workshops/qiime2/stats-dada2.qza \
+data/working
+```
+
+### Generate FeatureTable and FeatureData Summaries
+The feature-table summarize command will give you information on how many sequences are associated with each sample and with each feature, histograms of those distributions, and some related summary statistics. The feature-table tabulate-seqs command will provide a mapping of feature IDs to sequences, and provide links to easily BLAST each sequence against the NCBI nt database. 
+
+```
+qiime feature-table summarize \
+  --i-table ../data/working/table-dada2.qza \
+  --o-visualization ../data/results/table.qzv \
+  --m-sample-metadata-file ../data/raw/YOUR_sample_metadata.tsv
+```
+```
+qiime feature-table tabulate-seqs \
+  --i-data ../data/working/rep-seqs-dada2.qza \
+  --o-visualization ../data/results/rep-seqs.qzv
+```
