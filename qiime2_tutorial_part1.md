@@ -112,7 +112,7 @@ qiime metadata tabulate \
 Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
 
 ### Copy full dada2 results to data/working
-Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime_tutorial`.
+Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime2_tutorial`.
 ```
 cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/sample-metadata.tsv data/working
 ```
