@@ -111,10 +111,14 @@ qiime metadata tabulate \
 
 Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
 
-### Copy full dada2 results to your data/working
-Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime2_tutorial`.
+### Copy full dada2 results to data/working
+Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime_tutorial`.
 ```
-cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/data/sample_metadata.tsv data/working
+cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza 
+/data/genomics/workshops/qiime2/table-dada2.qza 
+/data/genomics/workshops/qiime2/stats-dada2.qza
+/data/genomics/workshops/qiime2/sample-metadata.tsv
+data/working
 ```
 
 ### Generate FeatureTable and FeatureData Summaries
@@ -124,15 +128,18 @@ The feature-table summarize command will give you information on how many sequen
 qiime feature-table summarize \
   --i-table ../data/working/table-dada2.qza \
   --o-visualization ../data/results/table.qzv \
-  --m-sample-metadata-file ../data/working/sample_metadata.tsv
+  --m-sample-metadata-file ../data/working/sample-metadata.tsv
 ```
+
 ```
 qiime feature-table tabulate-seqs \
   --i-data ../data/working/rep-seqs-dada2.qza \
   --o-visualization ../data/results/rep-seqs.qzv
 ```
-### Train taxonomic classifier
-## Import COI reference database sequences and metadata to QIIME2
+
+### Taxonomic classification
+#### Training the classifier
+#### Import COI reference database sequences and metadata to QIIME2
 ```
 qiime tools import \
   --type 'FeatureData[Sequence]' \
@@ -146,7 +153,7 @@ qiime tools import \
   --input-path /data/genomics/workshops/qiime2/data/classifier/bold_only.txt \
   --output-path ../data/working/ref-taxonomy.qza
 ```
-## Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
+#### Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
 ```
 qiime feature-classifier fit-classifier-naive-bayes \
   --i-reference-reads ../data/working/bold_CO1.qza \
@@ -154,3 +161,44 @@ qiime feature-classifier fit-classifier-naive-bayes \
   --o-classifier ../data/working/bold_classifier.qza \
   --verbose
 ```
+### Classifying the sequences
+```
+qiime feature-classifier classify-sklearn \
+  --i-classifier ../data/working/bold_classifier.qza \
+  --i-reads ../data/working/rep-seqs-dada2.qza \
+  --o-classification ../data/working/bold_taxonomy_results.qza
+```
+
+And now we visualize these results
+```
+qiime metadata tabulate \
+  --m-input-file ../data/working/bold_taxonomy_results.qza \
+  --o-visualization ../data/working/bold_taxonomy_results.qzv
+```
+
+### Generate a tree for phylogenetic diversity analyses
+1. alignment with mafft
+```
+ qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences ../data/working/rep-seqs-dada2.qza \
+  --o-alignment ../data/working/aligned-rep-seqs.qza \
+  --o-masked-alignment ../data/working/masked-aligned-rep-seqs.qza \
+  --o-tree ../data/working/unrooted-tree.qza \
+  --o-rooted-tree ../data/working/rooted-tree.qza
+```
+2. Export your tree to Newick format
+```
+qiime tools export ../data/working/rooted-tree.qza \
+  --output-dir ../data/results
+```
+
+###  Alpha diversity
+1. Use ```core-metrics```, which rarefies a FeatureTable to a user-specified depth, and then computes a series of alpha and beta diversity metrics. 
+```
+qiime diversity core-metrics \
+  --i-phylogeny ../data/working/rooted-tree.qza \
+  --i-table ../data/working/table-dada2.qza \
+  --p-sampling-depth 1109 \
+  --output-dir core-metrics-results
+ ```
+ There are lots of outputs here: look at them with ```ls``` and with the QIIME visualizer. Also see the QIIME tutorial webpage for further details.
