@@ -1,6 +1,6 @@
 # QIIME 2 Tutorial
 
-In this tutorial, we will run part of the [QIIME 2](https://docs.qiime2.org/2017.9/tutorials/moving-pictures/) Moving Pictures tutorial on Hydra, adjusted for the COI data generated recently at NMNH. 
+In this tutorial, we will run part of the [QIIME 2](https://docs.qiime2.org/2021.11/tutorials/moving-pictures/ Moving Pictures tutorial on Hydra, adjusted for the COI data generated recently at NMNH. 
 
 **To run QIIME2, you will need to both load the module and activate the environment**
 ```module load bioinformatics/qiime2/2019.1```
@@ -8,7 +8,7 @@ In this tutorial, we will run part of the [QIIME 2](https://docs.qiime2.org/2017
 ```source activate qiime2-2019.1```
 
 *Copy sample data to your space on Hydra*
-1. Change directory to your space on Hydra (e.g. ```cd /pool/genomics/USER```)
+1. Change directory to your space on Hydra (e.g. ```cd /scratch/genomics/USER```)
 2. Make a new directory for the data (e.g. ```mkdir qiime2_tutorial```) and ```cd``` into that new directory.
 3. Set up a directory structure for your `qiime2_tutorial` "project." Run `mkdir jobs`, then `mkdir logs`, then `mkdir -p data/raw`, then `mkdir -p data/working`, and finally `mkdir -p data/results`.
     Your directory should look like this:
@@ -112,7 +112,7 @@ qiime metadata tabulate \
 Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
 
 ### Copy full dada2 results to data/working
-Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/pool/genomics/USER/qiime2_tutorial`.
+Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/scratch/genomics/USER/qiime2_tutorial`.
 ```
 cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/data/sample-metadata.tsv data/working
 ```
