@@ -32,9 +32,21 @@ conda activate qiime2-2021.11
 7. Check to see that your data are there with `ls data/raw`. You should have two `fq.gz` files, R1 and R2 for two samples and a `.tsv`
 8. Edit the metadata file to include only the rows for the samples you have chosen. (Hint: if you are editing the file with `nano`, use `ctrl-k` to cut whole lines of text).
 
+### Basics on using QIIME commands
+
+All the QIIME commands start with `qiime` followed by commands, sub-commands and then options.
+
+You can list all of the commands with: `qiime --help`
+
+And then help for a command (or called a plugin in some cases) with: `qiime tools --help`
+
+And then the options for a subcommand with `qiime tools import --help`
+
+A useful thing is that tab-completion works for these commands. If you type `qiime<space>` and then hit the tab key twice, all the commands are listed.
+
 ### Import data into QIIME
 
-All data that is used as input to QIIME 2 is in form of QIIME 2 artifacts, which contain information about the type of data and the source of the data. So, the first thing we need to do is import these sequence data files into a QIIME 2 artifact.
+All data that is used as input to QIIME 2 is in form of QIIME 2 artifacts, which contain information about the type of data and the source of the data. The file extension used for these is `.qza` which stands for "qiime zip artifact." The first thing we need to do is import these sequence data files into a QIIME 2 artifact.
 
 **SAMPLE JOB FILE:**
 
@@ -72,6 +84,12 @@ Feel free to change the name of the output `.qza` file in the job file to someth
 
 Note that all the files in the directory given in `--input-path` are imported into the `.qza` file.
 
+What to see what other input formats are allowed? Run `qiime tools import --show-importable-formats` for a list.
+
+`CasavaOneEightSingleLanePerSampleDirFmt` is the fastq format file produced by illumina sequencers (Casava is the name of the Illumina base caller). There's more information about importing files in the [qiime importing tutorial](https://docs.qiime2.org/2022.2/tutorials/importing/).
+
+Hint: `.qza` files are acutally zipped archives. If you're curious what's contained in one, use `unzip paired-end.qza` to see the contents.
+
 Now we'll run a summarize command to look at the quality scores. Either run this within a job file with `qsub` or on an interactive job with `qrsh`
 
 ```
@@ -79,6 +97,8 @@ qiime demux summarize \
   --i-data ../data/working/paired-end.qza \
   --o-visualization ../data/results/paired-end.qzv
 ```
+
+The file extension use for visualizations is `.qzv`, which stands for "qiime zip visualization." They can contain tables or images. These are also zip archives if you want to try `unzip` on them.
 
 View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences.
 
