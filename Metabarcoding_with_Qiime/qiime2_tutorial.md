@@ -55,7 +55,8 @@ All data that is used as input to QIIME 2 is in form of QIIME 2 artifacts, which
 # ----------------Parameters---------------------- #
 #$ -S /bin/sh
 #$ -q sThC.q
-#$ -l mres=4G,h_data=4G,h_vmem=4G
+#$ -l mres=8G,h_data=8G,h_vmem=8G
+#$ -l cpu_arch='haswell|skylake'
 #$ -cwd
 #$ -j y
 #$ -N qiime_import
@@ -125,7 +126,15 @@ qiime demux summarize \
 View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences. From these plots, we'll decide how much to trim the sequences for quality.
 
 ### DADA2 quality control
-Now we'll trim our sequences for quality and do filter out chimeras. This will take the longest of anything we've done so far, so use `qsub` and a job file for this command.
+
+A lot of the magic of this pipeline happens in [DADA2](https://benjjneb.github.io/dada2/). The program does several things: trim low quality areas of sequence, merge forward & reverse reads, detect chimeras (described below), and denoise the sequence (also described below).
+
+- Sequence trimming: we give at what base the forward and reverse reads should be trimmed. This is base don the visualization from the `qiime demux summarize` command.
+- Merge reads: For the region of the COI locus being seuquenced forward and reverse reads overlap to give the full length of the sequenced region. The program takes the two reads and merges them into one full-length sequence of the locus.
+- Chimera detection: Chimeras are reads that are determined to contained sequence from two disparate pieces of DNA. This can be due to PCR or sequencing error.
+- Denoising: With amplicon sequencing you expect to sequence many copies of each PCR product. Due to sequencing (or PCR) error there can be small variations in the sequence. Denoising takes the sequence information and what is known about Illumina sequencing errors to detect and fix errors in a read.
+
+Let's run dad2, this will take the longest of anything we've done so far, so use `qsub` and a job file for this command.
 
 ```
 qiime dada2 denoise-paired \
@@ -137,6 +146,12 @@ qiime dada2 denoise-paired \
  --o-table ../data/working/table-dada2.qza \
  --o-denoising-stats ../data/working/stats-dada2.qza
 ```
+
+- `--o-representative-sequences`: Sequence of each ASV
+- `--o-table`: BIOM feature table (abundance of each sequence for each sample)
+- `--o-denoising-stats`: Denoising stats
+
+While it's running, something to discuss is the change in metabarcoding from OTUs (Operational Taxonomic Units) to ASVs (Amplicon Sequence Variants). Prior to denoising, the common way to handle sequencing and PCR errors was to take each sequence and cluster it using a threshold level of similarity. Those cluster became OTUs that were used in downstream analyses. With using denoising to limit errors, there was a move to keeping all (post-denoising) sequence variation, even single base differences (same as 100% OTUs in a clustering pipeline). These are ASVs which we'll be using in this analysis. The switch to ASVs was shown to lead to fewer errors (citation needed). Another advantage is that ASVs from different analyses could be combined for things like taxonomic identification which is not possible with OTUs because the results of a clustering are highly dependent on the input sequences.
 
 ### View dada2 results summary
 Now we'll run a summarize command to look at how dada2 filtered our reads.
@@ -153,7 +168,7 @@ Then you will need to scp `stats-data2.qzv` to your computer so that you can vie
 Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/scratch/genomics/USER/qiime2_tutorial`.
 
 ```
-cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/data/sample-metadata.tsv data/working
+cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/data/sample-metadata.tsv data/raw
 ```
 
 Now we'll run a summarize command to look at how dada2 filtered our reads.
@@ -171,7 +186,7 @@ The feature-table summarize command will give you information on how many sequen
 qiime feature-table summarize \
   --i-table ../data/working/table-dada2.qza \
   --o-visualization ../data/results/table.qzv \
-  --m-sample-metadata-file ../data/working/sample-metadata.tsv
+  --m-sample-metadata-file ../data/raw/sample-metadata.tsv
 ```
 
 ```
