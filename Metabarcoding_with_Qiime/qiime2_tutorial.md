@@ -2,7 +2,13 @@
 
 In this tutorial, we will run part of the [QIIME 2](https://docs.qiime2.org/2022.2/tutorials/moving-pictures/) Moving Pictures tutorial on Hydra, adjusted for the COI data generated recently at NMNH.
 
-**To run QIIME2, you will need to both load the conda module and activate the environment**
+**To run QIIME2, you will need to either load the qiime2 module or, if you've installed qiime2 on your own using conda, load the conda module and activate the environment**
+
+```
+module load bio/qiime2/2021.11
+```
+
+or
 
 ```
 module load tools/conda
@@ -85,11 +91,27 @@ Feel free to change the name of the output `.qza` file in the job file to someth
 
 Note that all the files in the directory given in `--input-path` are imported into the `.qza` file.
 
-What to see what other input formats are allowed? Run `qiime tools import --show-importable-formats` for a list.
+Want to see what other input formats are allowed? Run `qiime tools import --show-importable-formats` for a list.
 
 `CasavaOneEightSingleLanePerSampleDirFmt` is the fastq format file produced by illumina sequencers (Casava is the name of the Illumina base caller). There's more information about importing files in the [qiime importing tutorial](https://docs.qiime2.org/2022.2/tutorials/importing/).
 
 Hint: `.qza` files are acutally zipped archives. If you're curious what's contained in one, use `unzip paired-end.qza` to see the contents.
+
+You can also use the command `qiime tools peak` to get a bit of information about a `.qza` file:
+
+```
+qiime tools peek ../data/working/paired-end.qza
+UUID:        fde1b1c7-35f8-4021-804c-c4757fcb6887
+Type:        SampleData[PairedEndSequencesWithQuality]
+Data format: SingleLanePerSamplePairedEndFastqDirFmt
+```
+
+The command `qiime tools export` will extract the data portion of a `.qza` file.
+
+```
+qiime tools export --input-path ../data/working/stats-dada2.qza --output-path ../data/working
+Exported paired-end.qza as SingleLanePerSamplePairedEndFastqDirFmt to directory .
+```
 
 Now we'll run a summarize command to look at the quality scores. Either run this within a job file with `qsub` or on an interactive job with `qrsh`
 
@@ -99,12 +121,12 @@ qiime demux summarize \
   --o-visualization ../data/results/paired-end.qzv
 ```
 
-The file extension use for visualizations is `.qzv`, which stands for "qiime zip visualization." They can contain tables or images. These are also zip archives if you want to try `unzip` on them.
+The file extension use for visualizations is `.qzv`, which stands for "qiime zip visualization." They can contain tables, images or other data. These are also zip archives if you want to try `unzip` on them.
 
-View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences.
+View paired-end.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences. You can also download a copy from [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/paired-end.qzv)
 
 ### Trim primers
-Now we'll trim the primers off the sequences with cutadapt, which is available through the QIIME2 module. Run this with a job file and `qsub`
+Now we'll trim the primers off the sequences with cutadapt, which is available through QIIME2. Run this with a job file and `qsub`
 
 ```
 qiime cutadapt trim-paired \
@@ -115,7 +137,9 @@ qiime cutadapt trim-paired \
  --o-trimmed-sequences ../data/working/paired-end-primers-trimmed.qza
 ```
 
-Now we'll run a summarize command to look at the quality scores. Either run this within a job file with `qsub or on an interactive job with `qrsh`
+`--p-cores` is the number of CPUs to use. By using `$NSLOTS`, the cluster software will use the value of CPUs requested for your job.
+
+Now we'll run a summarize command to look at the quality scores. Either run this within a job file with `qsub` or on an interactive job with `qrsh`
 
 ```
 qiime demux summarize \
@@ -123,7 +147,7 @@ qiime demux summarize \
   --o-visualization ../data/results/paired-end-primers-trimmed.qzv
 ```
 
-View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences. From these plots, we'll decide how much to trim the sequences for quality.
+View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of your sequences. From these plots, we'll decide how much to trim the sequences for quality. A sample files is available [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/paired-end-primers-trimmed.qzv)
 
 ### DADA2 quality control
 
