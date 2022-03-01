@@ -109,9 +109,11 @@ Data format: SingleLanePerSamplePairedEndFastqDirFmt
 The command `qiime tools export` will extract the data portion of a `.qza` file.
 
 ```
-qiime tools export --input-path ../data/working/stats-dada2.qza --output-path ../data/working
+qiime tools export --input-path ../data/working/paired-end.qza --output-path ../data/working
 Exported paired-end.qza as SingleLanePerSamplePairedEndFastqDirFmt to directory .
 ```
+
+That created an extra copy of the input files (see them with `ls ../data/working`), so we'll delete them with `rm ../data/working/*fastq.gz`.
 
 Now we'll run a summarize command to look at the quality scores. Either run this within a job file with `qsub` or on an interactive job with `qrsh`
 
@@ -151,7 +153,7 @@ View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of 
 
 ### DADA2 quality control
 
-A lot of the magic of this pipeline happens in [DADA2](https://benjjneb.github.io/dada2/). The program does several things: trim low quality areas of sequence, merge forward & reverse reads, detect chimeras (described below), and denoise the sequence (also described below).
+A lot of the magic of this pipeline happens in [DADA2](https://benjjneb.github.io/dada2/) (the tutorial on that site is also very good). The program does several things: trim low quality areas of sequence, merge forward & reverse reads, detect chimeras (described below), and denoise the sequence (also described below).
 
 - Sequence trimming: we give at what base the forward and reverse reads should be trimmed. This is base don the visualization from the `qiime demux summarize` command.
 - Merge reads: For the region of the COI locus being seuquenced forward and reverse reads overlap to give the full length of the sequenced region. The program takes the two reads and merges them into one full-length sequence of the locus.
@@ -186,10 +188,11 @@ qiime metadata tabulate \
   --o-visualization ../data/results/stats-dada2.qzv
 ```
 
-Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/.
+Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/. You can download a sample [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/stats-dada2.qzv)
 
 ### Copy full dada2 results to data/working
-Copy Rebecca's completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/scratch/genomics/USER/qiime2_tutorial`.
+
+You've been working on only one part of sequences. For the next section we're going to use all the sequences. You can copy the completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/scratch/genomics/USER/qiime2_tutorial`.
 
 ```
 cp /data/genomics/workshops/qiime2/rep-seqs-dada2.qza /data/genomics/workshops/qiime2/table-dada2.qza /data/genomics/workshops/qiime2/stats-dada2.qza /data/genomics/workshops/qiime2/data/sample-metadata.tsv data/raw
