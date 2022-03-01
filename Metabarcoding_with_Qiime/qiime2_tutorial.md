@@ -185,8 +185,8 @@ The feature-table summarize command will give you information on how many sequen
 ```
 qiime feature-table summarize \
   --i-table ../data/working/table-dada2.qza \
-  --o-visualization ../data/results/table.qzv \
-  --m-sample-metadata-file ../data/raw/sample-metadata.tsv
+  --m-sample-metadata-file ../data/raw/sample-metadata.tsv \
+  --o-visualization ../data/results/table.qzv
 ```
 
 ```
