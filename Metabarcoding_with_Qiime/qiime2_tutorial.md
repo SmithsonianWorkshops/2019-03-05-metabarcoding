@@ -48,7 +48,7 @@ And then help for a command (or called a plugin in some cases) with: `qiime tool
 
 And then the options for a subcommand with `qiime tools import --help`
 
-A useful thing is that tab-completion works for these commands. If you type `qiime<space>` and then hit the tab key twice, all the commands are listed.
+A useful thing is that tab-completion works for these commands. If you type `qiime<space>` and then hit the tab key twice, all the commands are listed. If that doesn't work, you may need to enter this command to enable the tab-completions: `source tab-qiime`
 
 ### Import data into QIIME
 
