@@ -156,7 +156,7 @@ View demux.qzv here: https://view.qiime2.org/ and have a look at the quality of 
 A lot of the magic of this pipeline happens in [DADA2](https://benjjneb.github.io/dada2/) (the tutorial on that site is also very good). The program does several things: trim low quality areas of sequence, merge forward & reverse reads, detect chimeras (described below), and denoise the sequence (also described below).
 
 - Sequence trimming: we give at what base the forward and reverse reads should be trimmed. This is base don the visualization from the `qiime demux summarize` command.
-- Merge reads: For the region of the COI locus being seuquenced forward and reverse reads overlap to give the full length of the sequenced region. The program takes the two reads and merges them into one full-length sequence of the locus.
+- Merge reads: For the region of the COI locus being sequenced forward and reverse reads overlap to give the full length of the sequenced region. The program takes the two reads and merges them into one full-length sequence of the locus.
 - Chimera detection: Chimeras are reads that are determined to contained sequence from two disparate pieces of DNA. This can be due to PCR or sequencing error.
 - Denoising: With amplicon sequencing you expect to sequence many copies of each PCR product. Due to sequencing (or PCR) error there can be small variations in the sequence. Denoising takes the sequence information and what is known about Illumina sequencing errors to detect and fix errors in a read.
 
@@ -190,6 +190,13 @@ qiime metadata tabulate \
 
 Then you will need to scp `stats-data2.qzv` to your computer so that you can view the results at https://view.qiime2.org/. You can download a sample [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/stats-dada2.qzv)
 
+Columns:
+- `input`: starting number of (paired) reads.
+- `filtered`: reads that pass quality filtering.
+- `denoised`: reads after denoising.
+- `merged`: reads where the forward and reverse reads were successfuly merged with overlap.
+- `non-chimeric`: Merged reads that passed chimeric filters. These are the total number of usable sequences from the sample.
+
 ### Copy full dada2 results to data/working
 
 You've been working on only one part of sequences. For the next section we're going to use all the sequences. You can copy the completed dada2 results (for the entire dataset) to your own `data/working` directory. This command will work if you are in `/scratch/genomics/USER/qiime2_tutorial`.
@@ -216,30 +223,83 @@ qiime feature-table summarize \
   --o-visualization ../data/results/table.qzv
 ```
 
+You can download a copy of `table.qzv` [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/table.qzv)
+
+Understanding `table.qzv`:
+- "Frequency" refers to the number of usable sequences from the sample.
+- The "Overview" tab gives a report of the number of reads per sample.
+- The "Interactive Sample Detail" uses your metadata to explore the sequencing success.
+- The "Feature Detail" gives the unique identifier for each ASV, how many sequences were found of it (pooled amongst sample), and the number of samples it was found it.
+
+
 ```
 qiime feature-table tabulate-seqs \
   --i-data ../data/working/rep-seqs-dada2.qza \
   --o-visualization ../data/results/rep-seqs.qzv
 ```
 
+You can download a copy of `rep-seqs.qzv` [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/table.qzv)
+
+`rep-seqs.qzv` lists every ASV:
+- The ASV's unique identifier.
+- The ASV's sequence hyperlinked to an NCBI blastn search.
+
+We now have all the ASVs in `rep-seqs-dada2.qza` and where each ASV was found `table-dada2.qza`. This along with our sampling metadata, `sample-metadata.tsv`, is what we need to move on to taxonomic classification and downstream analyses!
+
 ### Taxonomic classification
+
+To assign taxonomy you need a reference database for your locus and the taxonomic groups that you're focusing on. In this study we're using a region of COI for a broad taxonomic assessment of marine species present.
+
+There are different methods to assign taxonomy. The one we'll be using is a supervised machine learning approach called a [Naive Bayes Classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier). It uses an input set of sequneces and their taxomoic assignment and then uses the model to assign taxonomy to the un-classified sequences in our samples. There are two-phases to using the classifier, first you train it with `fit-classifier-naive-bayes` and then you use the trained classifier with `classify-sklearn`.
+
+We will be using the [Midori Reference](http://reference-midori.info/) database for COI. This project uses data from GenBank's releases. They produce sets of sequences and taxonomy for different mitochondrial loci. These datasets are pre-formatted to be used as input for different meta-barcoding pipelines. We'll be using the QIIME formatted files.
+
+They produce sets of sequence files for each locus:
+
+- `LONGEST`: only one sequence per species, the representative with the longest sequence is used.
+- `UNIQ`: every unique sequence for each species is included.
+- `SP`: includes taxa that have genus level identification, but not species-level.
+
+Their datasets based on GenBank release 248 (Feb 2022) have this many sequences included (smallest to largest):
+
+- `MIDORI_LONGEST_NUC_GB248_CO1_QIIME.fasta`: 203165
+- `MIDORI_LONGEST_SP_NUC_GB248_CO1_QIIME.fasta`: 780172
+- `MIDORI_UNIQ_NUC_GB248_CO1_QIIME.fasta`: 1478887
+- `MIDORI_UNIQ_SP_NUC_GB248_CO1_QIIME.fasta`: 2632164
+
+For this workshop we'll be using `MIDORI_LONGEST_NUC_GB248_CO1_QIIME.fasta` as it is the smallest and will require the least time/memory to prepare for taxonomic identification.
+
 #### Training the classifier
-#### Import COI reference database sequences and metadata to QIIME2
+#### Download and import Midori CO1 sequences and metadata to QIIME2
+
+```
+cd data/raw
+wget http://reference-midori.info/download/Latest_GenBankRelease248/QIIME/longest/MIDORI_LONGEST_NUC_GB248_CO1_QIIME.fasta.gz
+gunzip MIDORI_LONGEST_NUC_GB248_CO1_QIIME.fasta.gz
+wget http://reference-midori.info/download/Latest_GenBankRelease248/QIIME/longest/MIDORI_LONGEST_NUC_GB248_CO1_QIIME.taxon.gz
+gunzip MIDORI_LONGEST_NUC_GB248_CO1_QIIME.taxon.gz
+cd ../..
+```
 
 ```
 qiime tools import \
   --type 'FeatureData[Sequence]' \
-  --input-path /data/genomics/workshops/qiime2/data/classifier/bold_CO1.fasta \
-  --output-path ../data/working/bold.qza
+  --input-path ../data/raw/MIDORI_LONGEST_NUC_GB248_CO1_QIIME.fasta \
+  --output-path ../data/working/midori_longest_GB248.qza
 ```
+
+`FeatureData[Sequence]` is how you import fasta data.
 
 ```
 qiime tools import \
   --type 'FeatureData[Taxonomy]' \
   --input-format HeaderlessTSVTaxonomyFormat \
-  --input-path /data/genomics/workshops/qiime2/data/classifier/bold_only.txt \
-  --output-path ../data/working/ref-taxonomy.qza
+  --input-path ../data/raw/MIDORI_LONGEST_NUC_GB248_CO1_QIIME.taxon \
+  --output-path ../data/working/midori_taxonomy_GB248_taxonomy.qza
 ```
+
+`HeaderlessTSVTaxonomyFormat` is a tab seperated file that doesn't have a header line. The taxonomy file is formated with the sequence ID and then the taxonomy separated by semicolons.
+
 
 #### Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
 
