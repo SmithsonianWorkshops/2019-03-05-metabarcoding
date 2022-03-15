@@ -301,13 +301,14 @@ qiime tools import \
 `HeaderlessTSVTaxonomyFormat` is a tab seperated file that doesn't have a header line. The taxonomy file is formated with the sequence ID and then the taxonomy separated by semicolons.
 
 
-#### Train the classifier - note that this step takes a lot more RAM than any previous jobs (try a few values and see what works).
+#### Train the classifier
+Note that this step takes a lot more RAM (>100GB) than any previous jobs and will run for around 12 hours.
 
 ```
 qiime feature-classifier fit-classifier-naive-bayes \
-  --i-reference-reads ../data/working/bold.qza \
-  --i-reference-taxonomy ../data/working/ref-taxonomy.qza \
-  --o-classifier ../data/working/bold_classifier.qza \
+  --i-reference-reads ../data/working/midori_longest_GB248.qza \
+  --i-reference-taxonomy ../data/working/midori_taxonomy_GB248_taxonomy.qza \
+  --o-classifier ../data/working/midori_longest_GB248_classifier.qza
   --verbose
 ```
 
@@ -315,17 +316,17 @@ qiime feature-classifier fit-classifier-naive-bayes \
 
 ```
 qiime feature-classifier classify-sklearn \
-  --i-classifier ../data/working/bold_classifier.qza \
+  --i-classifier ../data/working/midori_longest_GB248_classifier.qza \
   --i-reads ../data/working/rep-seqs-dada2.qza \
-  --o-classification ../data/working/bold_taxonomy_results.qza
+  --o-classification ../data/working/midori_taxonomy_results.qza
 ```
 
 And now we visualize these results
 
 ```
 qiime metadata tabulate \
-  --m-input-file ../data/working/bold_taxonomy_results.qza \
-  --o-visualization ../data/working/bold_taxonomy_results.qzv
+  --m-input-file ../data/working/midori_taxonomy_results.qza \
+  --o-visualization ../data/working/midori_taxonomy_results.qzv
 ```
 
 ### Generate a tree for phylogenetic diversity analyses
