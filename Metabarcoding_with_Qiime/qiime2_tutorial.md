@@ -298,18 +298,46 @@ qiime tools import \
   --output-path ../data/working/midori_taxonomy_GB248_taxonomy.qza
 ```
 
-`HeaderlessTSVTaxonomyFormat` is a tab seperated file that doesn't have a header line. The taxonomy file is formated with the sequence ID and then the taxonomy separated by semicolons.
+`HeaderlessTSVTaxonomyFormat` is a tab separated file that doesn't have a header line. The taxonomy file is formatted with the sequence ID and then the taxonomy separated by semicolons.
 
 
 #### Train the classifier
 Note that this step takes a lot more RAM (>100GB) than any previous jobs and will run for around 12 hours.
 
 ```
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$ -S /bin/sh
+#$ -q mThM.q
+#$ -l mres=120G,h_data=120G,h_vmem=120G,himem
+#$ -cwd
+#$ -j y
+#$ -N qiime_train
+#$ -o ../logs/qiime_train_mod.log
+#
+# ----------------Modules------------------------- #
+module load tools/conda
+start-conda
+conda activate qiime2-2021.11
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+
+#
 qiime feature-classifier fit-classifier-naive-bayes \
   --i-reference-reads ../data/working/midori_longest_GB248.qza \
   --i-reference-taxonomy ../data/working/midori_taxonomy_GB248_taxonomy.qza \
   --o-classifier ../data/working/midori_longest_GB248_classifier.qza
-  --verbose
+#
+echo = `date` job $JOB_NAME done
+```
+
+Since this job takes many hours to complete, you can make a copy of the trained classifer, `midori_longest_GB248_classifier.qza` into your directory with:
+
+```
+cp /data/genomics/workshops/qiime2/midori_longest_GB248_classifier.qza ../data/working/
 ```
 
 ### Classifying the sequences
@@ -318,10 +346,12 @@ qiime feature-classifier fit-classifier-naive-bayes \
 qiime feature-classifier classify-sklearn \
   --i-classifier ../data/working/midori_longest_GB248_classifier.qza \
   --i-reads ../data/working/rep-seqs-dada2.qza \
+  --p-confidence 0.90 \
+  --p-n-jobs $NSLOTS \
   --o-classification ../data/working/midori_taxonomy_results.qza
 ```
 
-And now we visualize these results
+And now we can visualize these results in table and bar plot form:
 
 ```
 qiime metadata tabulate \
@@ -329,11 +359,27 @@ qiime metadata tabulate \
   --o-visualization ../data/working/midori_taxonomy_results.qzv
 ```
 
-### Generate a tree for phylogenetic diversity analyses
-1. alignment with mafft
+```
+qiime taxa barplot \
+  --i-table ../data/working/table-dada2.qza \
+  --i-taxonomy ../data/working/midori_taxonomy_results.qza \
+  --m-metadata-file ../data/raw/sample-metadata.tsv \
+  --o-visualization ../data/results/taxa-bar-plots.qzv
+```
+
+Transfer `../data/working/midori_taxonomy_results.qzv` and `../data/results/taxa-bar-plots.qzv` to your local computer and view at https://view.qiime2.org
+You can download a copy of `midori_taxonomy_results.qzv` [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/midori_taxonomy_results.qzv)
+
+## Diversity metrics
+
+These metrics use the sequence data, not the taxonomic classification.
+
+### Generate an alignment and tree
+
+This uses mafft to align the representative sequences and then builds a phylogenetic tree using FastTree.
 
 ```
- qiime phylogeny align-to-tree-mafft-fasttree \
+qiime phylogeny align-to-tree-mafft-fasttree \
   --i-sequences ../data/working/rep-seqs-dada2.qza \
   --o-alignment ../data/working/aligned-rep-seqs.qza \
   --o-masked-alignment ../data/working/masked-aligned-rep-seqs.qza \
@@ -341,24 +387,17 @@ qiime metadata tabulate \
   --o-rooted-tree ../data/working/rooted-tree.qza
 ```
 
-2. Export your tree to Newick format
-
-```
-qiime tools export \
---input-path ../data/working/rooted-tree.qza \
---output-path ../data/results/rooted-tree.tre
-```
-
-###  Alpha diversity
-1. Use `core-metrics`, which rarefies a FeatureTable to a user-specified depth, and then computes a series of alpha and beta diversity metrics.
+### Core metrics suite
 
 ```
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny ../data/working/rooted-tree.qza \
   --i-table ../data/working/table-dada2.qza \
-  --m-metadata-file ../data/working/sample-metadata.tsv \
-  --p-sampling-depth 1109 \
-  --output-dir core-metrics-results
- ```
+  --p-sampling-depth 3500 \
+  --m-metadata-file ../data/raw/sample-metadata.tsv \
+  --output-dir ../data/working/core-metrics-results
+```
 
- There are lots of outputs here: look at them with `ls` and with the QIIME visualizer. Also see the QIIME tutorial webpage for further details.
+This produces several .qza files and .qzv visulations.
+
+There are lots of outputs here: look at them with `ls ../data/working/core-metrics-results` and with the QIIME visualizer. Also see the QIIME tutorial webpage for further details.
