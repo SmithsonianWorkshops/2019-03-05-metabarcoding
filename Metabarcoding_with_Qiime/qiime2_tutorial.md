@@ -346,8 +346,6 @@ cp /data/genomics/workshops/qiime2/midori_longest_GB248_classifier.qza ../data/w
 qiime feature-classifier classify-sklearn \
   --i-classifier ../data/working/midori_longest_GB248_classifier.qza \
   --i-reads ../data/working/rep-seqs-dada2.qza \
-  --p-confidence 0.90 \
-  --p-n-jobs $NSLOTS \
   --o-classification ../data/working/midori_taxonomy_results.qza
 ```
 
@@ -368,7 +366,7 @@ qiime taxa barplot \
 ```
 
 Transfer `../data/working/midori_taxonomy_results.qzv` and `../data/results/taxa-bar-plots.qzv` to your local computer and view at https://view.qiime2.org
-You can download a copy of `midori_taxonomy_results.qzv` [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/midori_taxonomy_results.qzv)
+You can download a copy of `midori_taxonomy_results.qzv` [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/midori_taxonomy_results.qzv) and `taxa-bar-plots.qzv` [here](https://github.com/SmithsonianWorkshops/2019-03-05-metabarcoding/raw/master/Metabarcoding_with_Qiime/qiime_artifacts/taxa-bar-plots.qzv)
 
 ## Diversity metrics
 
@@ -398,6 +396,14 @@ qiime diversity core-metrics-phylogenetic \
   --output-dir ../data/working/core-metrics-results
 ```
 
-This produces several .qza files and .qzv visulations.
+This produces several .qza files and .qzv visualizations in the directory `../data/working/core-metrics-results`
 
-There are lots of outputs here: look at them with `ls ../data/working/core-metrics-results` and with the QIIME visualizer. Also see the QIIME tutorial webpage for further details.
+Transfer these files to your computer and take a look at https://view.qiime2.org: `../data/working/core-metrics-results/bray_curtis_emperor.qzv`, `../data/working/core-metrics-results/jaccard_emperor.qzv`, `../data/working/core-metrics-results/unweighted_unifrac_emperor.qzv`, and `../data/working/core-metrics-results/weighted_unifrac_emperor.qzv`
+
+### Other metrics
+
+Take a look at this tutorial for more diversity metrics you can calculate:
+
+- https://docs.qiime2.org/2022.2/tutorials/moving-pictures/#alpha-and-beta-diversity-analysis
+- https://docs.qiime2.org/2022.2/tutorials/moving-pictures/#alpha-rarefaction-plotting
+- https://docs.qiime2.org/2022.2/tutorials/moving-pictures/#differential-abundance-testing-with-ancom
